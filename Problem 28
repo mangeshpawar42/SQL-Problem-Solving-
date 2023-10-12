@@ -1,0 +1,99 @@
+Q28.
+Table: Customers
+Column Name Type
+customer_id int
+name varchar
+country varchar
+customer_id is the primary key for this table.
+This table contains information about the customers in the company.
+Table: Product
+Column Name Type
+customer_id int
+name varchar
+country varchar
+product_id is the primary key for this table.
+This table contains information on the products in the company.
+price is the product cost.
+Table: Orders
+Column Name Type
+order_id int
+customer_id int
+product_id int
+order_date date
+quantity int
+order_id is the primary key for this table.
+This table contains information on customer orders.
+customer_id is the id of the customer who bought "quantity" products with id "product_id".
+Order_date is the date in format ('YYYY-MM-DD') when the order was shipped.
+Write an SQL query to report the customer_id and customer_name of customers who have spent at
+least $100 in each month of June and July 2020.
+Return the result table in any order.
+The query result format is in the following example.
+Input:
+Customers table:
+customer_id name country
+1 Winston USA
+2 Jonathan Peru
+3 Moustafa Egypt
+Product table:
+product_id description price
+10 LC Phone 300
+20 LC T-Shirt 10
+30 LC Book 45
+40 LC Keychain 2
+Orders table:
+order_id customer_id product_id order_date quantity
+1 1 10 2020-06-10 1
+2 1 20 2020-07-01 1
+3 1 30 2020-07-08 2
+4 2 10 2020-06-15 2
+5 2 40 2020-07-01 10
+6 3 20 2020-06-24 2
+7 3 30 2020-06-25 2
+9 3 30 2020-05-08 3
+
+
+WITH MONTHCTE AS (
+    SELECT
+        C.CUSTOMER_ID,
+        C.NAME AS CUSTOMER_NAME,
+        EXTRACT(MONTH FROM O.ORDER_DATE) AS ORDER_MONTH,
+        SUM(P.PRICE * O.QUANTITY) AS TOTAL_SPENDING
+    FROM CUSTOMERS C
+    JOIN ORDERS O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+    JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+    WHERE (EXTRACT(MONTH FROM O.ORDER_DATE) = 6 OR EXTRACT(MONTH FROM O.ORDER_DATE) = 7)
+        AND EXTRACT(YEAR FROM O.ORDER_DATE) = 2020
+    GROUP BY C.CUSTOMER_ID, CUSTOMER_NAME, ORDER_MONTH
+)
+SELECT CUSTOMER_ID, CUSTOMER_NAME
+FROM MONTHCTE
+GROUP BY CUSTOMER_ID, CUSTOMER_NAME
+HAVING MIN(CASE WHEN ORDER_MONTH = 6 THEN TOTAL_SPENDING ELSE 0 END) >= 100
+   AND MIN(CASE WHEN ORDER_MONTH = 7 THEN TOTAL_SPENDING ELSE 0 END) >= 100;
+
+-------------ANOTHER APPROACH------------------
+
+WITH MONTHCTE AS(
+  SELECT C.CUSTOMER_ID,
+         C.NAME,
+         C.COUNTRY,
+         EXTRACT(MONTH FROM ORDER_DATE) AS ORDER_MONTH,
+         SUM(P.PRICE*O.QUANTITY) AS TOTAL_SPENDING,
+         O.*,
+         P.*
+FROM CUSTOMERS C
+JOIN ORDERS O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+JOIN PRODUCT P ON O.PRODUCT_ID = P.PRODUCT_ID
+WHERE (EXTRACT(MONTH FROM ORDER_DATE) = 6 OR EXTRACT(MONTH FROM ORDER_DATE) = 7) AND EXTRACT(YEAR FROM ORDER_DATE) = 2020)
+      
+GROUP BY CUSTOMER_ID,NAME, ORDER_MONTH
+)
+SELECT CUSTOMER_ID, CUSTOMER_NAME 
+FROM MONTHCTE
+GROUP BY CUSTOMER_ID, CUSTOMER_NAME
+HAVING MIN(TOTAL_SPENDING)>=100;
+
+
+
+
