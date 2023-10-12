@@ -1,0 +1,61 @@
+Table: Products
+Column Name Type
+product_id int
+product_name varchar
+product_category varchar
+product_id is the primary key for this table.
+This table contains data about the company's products.
+Table: Orders
+Column Name Type
+product_id int
+order_date date
+unit int
+There is no primary key for this table. It may have duplicate rows.
+product_id is a foreign key to the Products table.
+unit is the number of products ordered in order_date.
+Write an SQL query to get the names of products that have at least 100 units ordered in February 2020
+and their amount.
+Return result table in any order.
+The query result format is in the following example.
+Input:
+Products table:
+product_id product_name
+product_catego
+ry
+1
+Leetcode
+Solutions Book
+2
+Jewels of
+Stringology Book
+3 HP Laptop
+4 Lenovo Laptop
+5 Leetcode Kit T-shirt
+
+WITH MONTHCTE AS (
+  SELECT  P.PRODUCT_ID,
+          P.PRODUCT_NAME,
+          O.ORDER_DATE,
+          O.UNIT,
+          SUM(O.UNIT) AS TOTAL_UNIT
+  FROM PRODUCTS P
+  JOIN ORDERS O ON P.PRODUCT_ID = O.PRODUCT_ID
+  WHERE EXTRACT(MONTH FROM ORDER_DATE) = 2 AND EXTRACT(YEAR FROM ORDER_DATE) = 2020 
+  GROUP BY PRODUCT_ID, PRODUCT_NAME
+)
+SELECT PRODUCT_NAME
+FROM MONTHCTE
+WHERE TOTAL_UNIT >= 100;
+
+
+
+
+
+
+
+
+
+
+
+
+
