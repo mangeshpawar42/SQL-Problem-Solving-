@@ -1,0 +1,54 @@
+Table: Employee
+Column Name Type
+id int
+name varchar
+department varchar
+managerId int
+id is the primary key column for this table.
+Each row of this table indicates the name of an employee, their department, and the id of their
+manager.
+If managerId is null, then the employee does not have a manager.
+No employee will be the manager of themself.
+Write an SQL query to report the managers with at least five direct reports.
+Return the result table in any order.
+The query result format is in the following example.
+Input:
+Employee table:
+id name department managerId
+101 John A None
+102 Dan A 101
+103 James A 101
+104 Amy A 101
+105 Anne A 101
+106 Ron B 101
+
+SELECT NAME 
+FROM EMPLOYEE
+WHERE ID IN (
+SELECT MANAGERID 
+FROM EMPLOYEE
+GROUP BY MANAGERID
+HAVING COUNT(*) >= 5);
+
+--------------------ANOTHER APPROACH------------------
+
+WITH manager AS (
+  SELECT DISTINCT
+    managerId,
+    COUNT(managerId) OVER (PARTITION BY managerId) [manager5]
+  FROM Employee
+)
+SELECT e.name
+FROM manager m JOIN Employee e ON e.id = m.managerId
+WHERE m.manager5 >= 5;
+
+
+----------ANOTHER APPROACH ----------
+
+DIRECT USED JOIN 
+
+SELECT EE.NAME 
+FROM EMPLOYEE E
+JOIN EMPLOYEE EE ON E.MANAGERID = EE.ID
+GROUP BY E.NAME
+HAVING COUNT(E.ID) >=5;
