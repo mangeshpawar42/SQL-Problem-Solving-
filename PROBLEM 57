@@ -1,0 +1,62 @@
+Table: Orders
+Column Name Type
+order_number int
+customer_number int
+order_number is the primary key for this table.
+This table contains information about the order ID and the customer ID.
+Write an SQL query to find the customer_number for the customer who has placed the largest
+number of orders.
+The test cases are generated so that exactly one customer will have placed more orders than any
+other customer.
+The query result format is in the following example.
+Input:
+Orders table:
+order_number customer_numbe
+1 1
+2 2
+3 3
+4 3
+
+
+
+SELECT CUSTOMER_NUMBER
+FROM (
+  SELECT CUSTOMER_NUMBER, SUM(ORDER_NUMBER) AS TOTAL
+  FROM ORDERS
+  GROUP BY CUSTOMER_NUMBER
+) AS TotalOrders
+ORDER BY TOTAL DESC
+LIMIT 1;
+
+
+------------ANOTHER ----------------------
+
+WITH TotalOrders AS (
+  SELECT CUSTOMER_NUMBER, SUM(ORDER_NUMBER) AS TOTAL
+  FROM ORDERS
+  GROUP BY CUSTOMER_NUMBER
+)
+SELECT CUSTOMER_NUMBER
+FROM (
+  SELECT CUSTOMER_NUMBER, TOTAL, RANK() OVER (ORDER BY TOTAL DESC) AS rnk
+  FROM TotalOrders
+) RankedOrders
+WHERE rnk = 1;
+
+---------------------------------------------------------
+
+WITH TotalOrders AS (
+  SELECT
+    CUSTOMER_NUMBER,
+    SUM(ORDER_NUMBER) OVER (PARTITION BY CUSTOMER_NUMBER) AS TOTAL,
+    RANK() OVER (PARTITION BY CUSTOMER_NUMBER ORDER BY SUM(ORDER_NUMBER) DESC) AS RNK
+  FROM ORDERS
+)
+
+SELECT CUSTOMER_NUMBER
+FROM TotalOrders
+WHERE RNK = 1;
+
+------------------0-0-0-0-----------------
+COUNT ALSO GIVE THE SAME OUTPUT
+
