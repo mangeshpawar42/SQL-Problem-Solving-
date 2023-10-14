@@ -1,0 +1,74 @@
+Table: Books
+Column Name Type
+book_id int
+name varchar
+available_from date
+book_id is the primary key of this table.
+Table: Orders
+Column Name Type
+order_id int
+book_id int
+quantity int
+dispatch_date date
+order_id is the primary key of this table.
+book_id is a foreign key to the Books table.
+Write an SQL query that reports the books that have sold less than 10 copies in the last year,
+excluding books that have been available for less than one month from today. Assume today is
+2019-06-23.
+Return the result table in any order.
+The query result format is in the following example.
+Input:
+Books table:
+book_id name available_from
+1
+"Kalila And
+Demna" 2010-01-01
+2 "28 Letters" 2012-05-12
+3 "The Hobbit" 2019-06-10
+4
+"13 Reasons
+Why" 2019-06-01
+5
+"The Hunger
+Games" 2008-09-21
+
+
+SELECT BOOK_ID , NAME
+FROM BOOKS 
+WHERE BOOK_ID NOT IN (
+SELECT BOOK_ID
+FROM ORDERS 
+WHERE (DISPATCH_DATE BETWEEN  DATE_SUB('2019-06-23', INTERVAL 1 YEAR) 
+GROUP BY BOOK_ID
+HAVING SUM(QUANTITY)>=10
+AND 
+AVAILABLE_FROM < DATE_SUB('2019-06-23',INTERVAL 1 MONTH))
+
+
+----------ANOTHER---------------
+
+select Books.book_id, name from Books join Orders
+    on Books.book_id = Orders.book_id
+    where available_from < '2019-05-23'
+    and dispatch_date between '2018-06-23' and '2019-06-23'
+    group by Books.book_id
+    having sum(quantity) < 10
+    union
+select book_id, name from Books
+    where available_from < '2019-05-23'
+    and book_id not in (
+        select distinct book_id from Orders where dispatch_date between '2018-06-23' and '2019-06-23'
+    );
+
+
+----------------------------------
+
+SELECT DISTINCT b.book_id, b.name
+FROM books b 
+WHERE available_from < '2019-05-23'
+AND book_id NOT IN
+(SELECT book_id
+ FROM orders 
+ WHERE dispatch_date > '2018-06-23'
+ GROUP BY book_id
+ HAVING SUM(quantity) >= 10);
