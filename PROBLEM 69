@@ -27,3 +27,21 @@ SELECT
 FROM RankedLogs
 GROUP BY log_id - row_number
 ORDER BY start_id;
+
+
+
+---------------------------------------------
+MOST SIMPLIFIED ANSWER
+
+
+WITH RankedLogs AS (
+    SELECT log_id, ROW_NUMBER() OVER (ORDER BY log_id) AS row_number
+    FROM Logs
+)
+SELECT
+    MIN(log_id) AS start_id,
+    MAX(log_id) AS end_iD,
+    (log_id - row_number) AS NEW
+FROM RankedLogs
+GROUP BY NEW
+ORDER BY start_id;
