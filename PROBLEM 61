@@ -19,3 +19,12 @@ FROM POINT P1
 CROSS JOIN POINT P2
 WHERE P1.X<>P2.X;
 
+
+
+==============================================
+
+
+SELECT MIN(ABS(P1.X - P2.X)) AS SHORTEST
+FROM Point AS P1
+JOIN Point AS P2 ON P1.X < P2.X;
+
