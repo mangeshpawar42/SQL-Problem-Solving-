@@ -13,6 +13,21 @@ values ('OUT','181868',13),('OUT','2159010',8)
 
 2. Write a query to retrieve number having both incoming and outgoing calls & sum of duration of outgoing is more than that of incoming.
 
+WITH CallTypeCounts AS (
+  SELECT
+    call_number,
+    SUM(CASE WHEN call_type = 'OUT' THEN call_duration ELSE 0 END) AS total_outgoing_duration,
+    SUM(CASE WHEN call_type = 'INC' THEN call_duration ELSE 0 END) AS total_incoming_duration
+  FROM call_details
+  GROUP BY call_number
+)
+
+SELECT call_number
+FROM CallTypeCounts
+WHERE total_incoming_duration > 0 AND total_outgoing_duration > total_incoming_duration;
+
+another approach for another query----------------------------
+
 WITH cte AS (
   SELECT
     call_number,
