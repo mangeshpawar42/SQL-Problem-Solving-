@@ -1,0 +1,45 @@
+CREATE TABLE Person (
+  id INT PRIMARY KEY,
+  name VARCHAR(255),
+  phone_number VARCHAR(255)
+);
+--
+CREATE TABLE Country (
+  name VARCHAR(255),
+  country_code VARCHAR(3) PRIMARY KEY
+);
+--
+CREATE TABLE Calls (
+  caller_id INT,
+  callee_id INT,
+  duration INT
+);
+--
+INSERT INTO Person (id, name, phone_number) VALUES
+(3, 'Jonathan', '051-1234567'),
+(12, 'Elvis', '051-7654321'),
+(1, 'Monce', '972-5432110'),
+(2, 'Maroua', '212-4321098'),
+(7, 'Meir', '972-2211111'),
+(9, 'Rachel', '972-2221111');
+--
+INSERT INTO Country (name, country_code) VALUES
+('Peru', '051'),
+('Israel', '972'),
+('Morocco', '212'),
+('Germany', '049'),
+('Ethiopia', '251');
+--
+INSERT INTO Calls (caller_id, callee_id, duration) VALUES
+(1, 9, 33),
+(2, 9, 4),
+(1, 2, 59),
+(3, 12, 102),
+(3, 12, 330),
+(12, 3, 5),
+(7, 9, 13),
+(7, 1, 3),
+(9, 7, 1),
+(1, 7, 7);
+
+3. A telecommunications company wants to invest in new countries. The company intends to invest in countries where the average call duration of the calls in that country is strictly greater than the global average call duration. Write an SQL query to find the countries where this company can invest.
