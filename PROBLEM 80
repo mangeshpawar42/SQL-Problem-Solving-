@@ -1,0 +1,78 @@
+
+Assume you are given the table below containing information on user transactions for particular
+products. Write a query to obtain the year-on-year growth rate for the total spend of each product for
+each year.
+Output the year (in ascending order) partitioned by product id, current year's spend, previous year's
+spend and year-on-year growth rate (percentage rounded to 2 decimal places).
+Level - Hard
+Hint - Use extract function
+user_transactions Table:
+Column Name Type
+transaction_id integer
+product_id integer
+spend decimal
+transaction_date datetime
+user_transactions Example Input:
+transaction_i
+d
+product_i
+d
+spend transaction_date
+1341 123424 1500.60 12/31/2019 12:00:00
+1423 123424 1000.20 12/31/2020 12:00:00
+1623 123424 1246.44 12/31/2021 12:00:00
+1322 123424 2145.32 12/31/2022 12:00:00
+Example Output:
+y
+e
+a
+r
+product_i
+d
+curr_year_spend prev_year_spend yoy_rate
+2
+0
+9
+123424 1500.60
+2
+0
+2
+0
+123424 1000.20 1500.60 -33.35
+2
+0
+2
+123424 1246.44 1000.20 24.62
+2
+0
+2
+2
+123424 2145.32 1246.44 72.12
+
+YoY Growth Rate (%) = [(Current Year Value - Previous Year Value) / Previous Year Value] * 100
+
+
+
+-------------------------------------------------
+
+
+WITH CTE AS (
+    SELECT
+        transaction_id,
+        product_id,
+        spend AS cur_year_spend,
+        transaction_date,
+        LAG(spend) OVER (PARTITION BY product_id ORDER BY transaction_date) AS prev_year_spend
+    FROM user_transactions
+)
+
+SELECT
+    transaction_id,
+    product_id,
+   	cur_year_spend,
+    CASE
+        WHEN prev_year_spend IS NULL THEN NULL
+        ELSE ((cur_year_spend - prev_year_spend) / prev_year_spend) * 100
+    END AS yoy_rate
+FROM CTE;
+
