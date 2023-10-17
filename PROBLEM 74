@@ -1,0 +1,28 @@
+Write an SQL query to report the fraction of players that logged in again on the day after the day they
+first logged in, rounded to 2 decimal places.
+
+WITH CTE AS
+(
+  SELECT PLAYER_ID,
+          MIN(EVENT_DATE) AS FIRST_LOGIN
+  FROM ACTIVITY 
+  GROUP BY PLAYER_ID)
+
+SELECT 
+    ROUND((COUNT(DISTINCT C.PLAYER_ID)/(SELECT COUNT(DISTINCT PLAYER_ID) FROM ACTIVITY)),2) AS FRACTION
+FROM CTE C
+JOIN ACTIVITY A ON A.PLAYER_ID = C.PLAYER_ID
+AND DATEDIFF(C.EVENT_DATE,A.EVENT_DATE) = -1;
+
+------------------------------------------------------------
+
+WITH cte AS (
+SELECT player_id, MIN(event_date) as first_login
+FROM Activity
+GROUP BY player_id
+)
+
+SELECT ROUND(SUM(CASE WHEN DATEDIFF(event_date, first_login)=1 THEN 1 ELSE 0  END) / COUNT(DISTINCT cte.player_id), 2) as fraction
+FROM Activity as a
+JOIN cte 
+ON a.player_id = cte.player_id
