@@ -1,0 +1,32 @@
+Table: Scores
+Column Name Type
+player_name varchar
+gender varchar
+day date
+score_points int
+(gender, day) is the primary key for this table.
+A competition is held between the female team and the male team.
+Each row of this table indicates that a player_name and with gender has scored score_point in
+someday.
+Gender is 'F' if the player is in the female team and 'M' if the player is in the male team.
+Write an SQL query to find the total score for each gender on each day.
+Return the result table ordered by gender and day in ascending order.
+The query result format is in the following example.
+
+Scores table:
+player_name gender day score_points
+Aron F 2020-01-01 17
+Alice F 2020-01-07 23
+Bajrang M 2020-01-07 7
+Khali M 2019-12-25 11
+Slaman M 2019-12-30 13
+Joe M 2019-12-31 3
+Jose M 2019-12-18 2
+Priya F 2019-12-31 23
+Priyanka F 2019-12-30 17
+
+
+
+SELECT player_name ,gender
+    SUM(SCORE_POINTS) OVER(PARTITON BY GENDER ORDER BY DAY) AS TOTAL_SCORE
+FROM SCORES;
