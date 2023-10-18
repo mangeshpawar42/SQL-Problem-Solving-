@@ -19,3 +19,77 @@ item_id item_type item_category square_footage
 2452 prime_eligible television 85.00
 3255 not_prime side table 22.60
 1672 prime_eligible laptop 8.50
+
+Q82
+Assume you have the table below containing information on Facebook user actions. Write a query to
+obtain the active user retention in July 2022. Output the month (in numerical format 1, 2, 3) and the
+number of monthly active users (MAUs).
+Hint: An active user is a user who has user action ("sign-in", "like", or "comment") in the current month
+and last month.
+Hint- Use generic correlated subquery
+
+Q83
+Google's marketing team is making a Superbowl commercial and needs a simple statistic to put on
+their TV ad: the median number of searches a person made last year.
+However, at Google scale, querying the 2 trillion searches is too costly. Luckily, you have access to the
+summary table which tells you the number of searches made last year and how many Google users
+fall into that bucket.
+Write a query to report the median of searches made by a user. Round the median to one decimal
+point.
+Hint- Write a subquery or common table expression (CTE) to generate a series of data (that's keyword
+for column) starting at the first search and ending at some point with an optional incremental value.
+
+Q86
+Sometimes, payment transactions are repeated by accident; it could be due to user error, API failure or
+a retry error that causes a credit card to be charged twice.
+Using the transactions table, identify any payments made at the same merchant with the same credit
+card for the same amount within 10 minutes of each other. Count such repeated payments.
+Level - Hard
+Hint- Use Partition and order by
+Assumptions:
+● The first transaction of such payments should not be counted as a repeated payment. This
+means, if there are two transactions performed by a merchant with the same credit card and
+for the same amount within 10 minutes, there will only be 1 repeated payment.
+
+SELECT COUNT(*)
+FROM transactions t1 JOIN transactions t2
+on t1.transaction_id < t2.transaction_id
+and t1.merchant_id = t2.merchant_id
+and t1.credit_card_id = t2.credit_card_id
+and t1.amount = t2.amount
+and EXTRACT(EPOCH FROM t2.transaction_timestamp - t1.transaction_timestamp)/60 <= 10;
+
+
+Q87
+DoorDash's Growth Team is trying to make sure new users (those who are making orders in their first
+14 days) have a great experience on all their orders in their 2 weeks on the platform.
+Unfortunately, many deliveries are being messed up because:
+● the orders are being completed incorrectly (missing items, wrong order, etc.)
+● the orders aren't being received (wrong address, wrong drop off spot)
+● the orders are being delivered late (the actual delivery time is 30 minutes later than when the
+order was placed). Note that the estimated_delivery_timestamp is automatically set to 30
+minutes after the order_timestamp.
+Hint- Use Where Clause and joins
+
+with totorders as(
+select o.order_id, o.customer_id, o.trip_id,o.status, o.order_timestamp,
+t.estimated_delivery_timestamp as etimestamp, t.actual_delivery_timestamp as atimestamp,
+c.signup_timestamp
+from orders as o
+join trips as t on t.trip_id = o.trip_id
+join customers as c on c.customer_id = o.customer_id
+where extract(month from c.signup_timestamp) = 06
+AND extract(year from c.signup_timestamp) = 2022
+and c.signup_timestamp+interval '14 days' > o.order_timestamp
+),
+badorders as(
+select *
+from totorders
+where not status = 'completed successfully' or
+atimestamp>etimestamp or
+atimestamp is null
+)
+select round(100.0*count(order_id)/(select count(order_id)from totorders),2) as bad_experience_pct
+from badorders
+
+Q
