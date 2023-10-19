@@ -1,0 +1,48 @@
+You're given two tables on Spotify users' streaming data. songs_history table contains the historical
+streaming data and songs_weekly table contains the current week's streaming data.
+Write a query to output the user id, song id, and cumulative count of song plays as of 4 August 2022
+sorted in descending order.
+Hint- Use group by
+Definitions:
+● song_weekly table currently holds data from 1 August 2022 to 7 August 2022.
+● songs_history table currently holds data up to to 31 July 2022. The output should include the
+historical data in this table.
+Assumption:
+● There may be a new user or song in the songs_weekly table not present in the songs_history
+table.
+songs_history Table:
+Column Name Type
+history_id integer
+user_id integer
+song_id integer
+song_plays integer
+songs_history Example Input:
+history_id user_id song_id song_plays
+10011 777 1238 11
+12452 695 4520 1
+song_plays: Refers to the historical count of streaming or song plays by the user.
+songs_weekly Table:
+Column Name Type
+user_id integer
+song_id integer
+listen_time datetime
+songs_weekly Example Input:
+user_id song_id listen_time
+777 1238 08/01/2022 12:00:00
+695 4520 08/04/2022 08:00:00
+125 9630 08/04/2022 16:00:00
+695 9852 08/07/2022 12:00:00
+
+WITH cte AS (
+  SELECT user_id, song_id, song_plays
+  FROM songs_history
+  UNION ALL
+  SELECT user_id, song_id, COUNT(song_id)
+  FROM songs_weekly
+  WHERE DATE(listen_time) = '2022-08-04'
+  GROUP BY user_id, song_id
+)
+SELECT user_id, song_id, SUM(song_plays) AS cumulative_plays
+FROM cte
+GROUP BY user_id, song_id
+ORDER BY cumulative_plays DESC;
