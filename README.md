@@ -1,6 +1,5 @@
 # SQL-Problem-Solving-
 
-
 REVISION PROBLEMS :
 
       - ALL GAME ANALYSIS PROBLEM
